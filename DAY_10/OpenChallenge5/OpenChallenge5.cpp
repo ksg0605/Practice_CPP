@@ -6,6 +6,7 @@ class Morse{
   string alphabet[26];                                        //알파벳의 모스 부호 저장
   string digit[10];                                           //숫자의 모스 부호 저장
   string slash, question, comma, period, plus, equal;         //특수 문자의 모스 부호 저징
+  string savedText2Morse;
 public:
   Morse();                                                    //배열 및 특수 문자의 모스 부호 초기화
   void text2Mores(string text, string &morse);                //영문 텍스트를 모스 부호로 변환
@@ -51,11 +52,124 @@ Morse::Morse(){
   digit[8] = '---.. ';
   digit[9] = '----. ';
   
-  slash, question, comma, period, plus, equal = " ";         //특수 문자의 모스 부호 저징
+  slash = '-..-. ';
+  question = '..--.. ';
+  comma = '--..--';
+  period = '.-.-.- ';
+  plus = '.-.-. ';
+  equal = '-...-';
 }
 
 void Morse::text2Mores(string text, string &morse){
-  for(int i = 0; i < text.length(); i++){
+  int len = text.length();
+  for(int i = 0; i < len; i++){
+    if(text[i] >= 97 && text[i] < 123){
+      morse.append(alphabet[text[i]-97]);
+    }
+    else if(text[i] >= 48 && text[i] < 58){
+      morse.append(digit[text[i]-48]);
+    }
+    else if(text[i] == 47){
+      morse.append(slash);
+    }
+    else if(text[i] == 63){
+      morse.append(question);
+    }
+    else if(text[i] == 44){
+      morse.append(comma);
+    }
+    else if(text[i] == 46){
+      morse.append(period);
+    }
+    else if(text[i] == 61){
+      morse.append(equal);
+    }
+    else if(text[i] == 32){
+      morse.append("  ");
+    }
+    else if(text[i] == 43){
+      morse.append(plus);
+    }
+    else{
+      cout<<"잘못 입력해 비정상 종료!"<<endl;
+      break;
+    }
+  }
+  cout<< morse << endl;
+  this->savedText2Morse = morse;
+}
+
+bool Morse::morse2Text(string morse, string& text){
+  string changeWord;
+  string compareText;
+  string morse2 = morse;
+  while(morse2.length()>0){
+
+    int index = morse2.find(" ");
+    if(index < 1){
+      changeWord="";
+      morse2.erase(0, 2);
+      compareText.append(" ");
+    }
+    else{
+      changeWord = morse2.substr(0, index+1);
+      morse2.erase(0, index+1);
+    }
+
+    for(int i=0; i<26; i++){
+      if(changeWord == alphabet[i]){
+        char word[2] = {i+97, '\0'};
+        compareText.append(&word[0]);
+        break;
+      }
+      else if(i<10 && changeWord==digit[i]){
+        char word[2] = {i+48, '\0'};
+        compareText.append(&word[0]);
+        break;
+      }
+    }
+
+    if(changeWord == slash){
+      compareText.append("/");
+    }
+    else if(changeWord == question){
+      compareText.append("?");
+    }
+    else if(changeWord == comma){
+      compareText.append(",");
+    }
+    else if(changeWord == period){
+      compareText.append(".");
+    }
+    else if(changeWord == comma){
+      compareText.append("+");
+    }
+    else if(changeWord == equal){
+      compareText.append("=");
+    }
     
   }
+  cout<<compareText;
+
+  if(compareText == text)
+    return true;
+  else
+    return false;  
+}
+
+int main(){
+  Morse morse;
+  string t;
+  string m;
+
+  cout<<"아래에 영문 텍스트를 입력하세요. 모스 부호로 바꿉니다."<<endl;
+  getline(cin, t, '\n');
+
+  morse.text2Mores(t, m);
+
+  cout<<endl<<"모스 부호를 다시 영문 텍스트로 바꿉니다." <<endl;
+  
+  int trueOrFalse = morse.morse2Text(m, t);
+  if(trueOrFalse) cout<<"good";
+  else cout<<"bad";
 }
